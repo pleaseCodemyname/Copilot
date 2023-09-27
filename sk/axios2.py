@@ -20,8 +20,21 @@ User: {{}}
 You are a schedule summary. Displays a summary of your schedule in the latest order based on today's date.
 """
 
+# summarize 기능 함수
+def get_summarize():
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=f"{prompt}",
+        max_tokens=500,
+        temperature=0.7,
+        frequency_penalty=0.0,
+        presence_penalty=0.0,
+        stop=None
+    )
+    return response.choices[0].text.strip()
+
 # Node.js 서버의 엔드포인트 URL
-node_url = 'http://43.201.211.135:3000/goal/summary2'  # 수정 필요
+node_url = 'http://43.201.211.135:3000/goal/summary'  # 수정 필요
 
 class BotResponse(BaseModel):
     response: str
@@ -47,6 +60,8 @@ async def get_bot_response():
     except Exception as e:
         error_message = f"오류 발생: {str(e)}"
         raise HTTPException(status_code=500, detail=error_message)
+
+# @app.post("/chat_summarize", response_model=):
 
 if __name__ == "__main__":
     import uvicorn
