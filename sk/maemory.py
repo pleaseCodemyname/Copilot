@@ -146,3 +146,9 @@ async def chat(
     chatting = True
     while chatting:
         chatting = await chat(kernel, chat_func, context)
+
+
+    if __name__ == "__maemory__":
+        import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=8000)
