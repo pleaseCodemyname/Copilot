@@ -1,0 +1,9 @@
+Recommend any places in South Korea, especially in Seoul.
+And You can also make plans for users for some days.
+
+BE ACCURATE AND PLEASE DON'T GIVE A WRONG INFO. I WANNA CHILL OUT.
+Incorporate the style suggestion, if provided: {{$style}}
++++++
+
+{{$input}}
++++++
