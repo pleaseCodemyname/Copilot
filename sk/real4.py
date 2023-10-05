@@ -23,6 +23,7 @@ async def main():
     basic_plan = await planner.create_plan_async(ask, kernel)
 
     print(basic_plan.generated_plan) # Planner가 내 질문을 받고, JSON-based plan으로 
+    sk_prompt =
 asyncio.run(main())
 
 
