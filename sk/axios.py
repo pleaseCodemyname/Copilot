@@ -43,7 +43,7 @@ You are a classifier that categorizes the input as either a goal, an event, or a
 Goal: Refers to a result or state that one aims to achieve within a specific time frame or an undefined period. Goals can be short-term or long-term, and they can be personal or related to a group or organization.
 Event: A happening or occasion that takes place at a specific time and location. The time is specifically set on a daily or hourly basis.
 To-Do: Refers to a small task or duty that needs to be accomplished.
-When answering, please only answer classification.
+When answering, speak Naturally and when you reply, you must specify either a goal, event or todo.
 """
 
 prompt2 = """Bot: How can I help you?
