@@ -14,8 +14,11 @@ User:> {{$user_input}}
 ChatBot:>
 """
 
-summarize_prompt """
+summarize_prompt = """
 You are a schedule summary. Displays a summary of your schedule in the latest order based on today's date.
+"""
+
+crud_prompt = """
 """
 
 extract_prompt = """
@@ -49,31 +52,6 @@ DeletePlan: The user wants to delete an user's plan.
 User:> {{$user_input}}
 """
 
-crud_prompt = """  
-QueryByTime: The user wants to find information about user's plan, and a time range is given.
-
-QueryByQuery: The user wants to find information about user's plan, but no time range is provided.
-
-CreatePlan: The user wants to create a plan. 
-
-RecommandPlan: the user asks for recommendations for plan
-
-UpdatePlan: The user wants to modify an user's plan.
-
-DeletePlan: The user wants to delete an user's plan.
-
-You have six definitions , and you need to choose only one that fits well with the context of the conversation
-
-Through the user's conversation, understanding context-appropriate words, and then extracting active content in the next sentence, 
-if it's QueryByTime, ask ""content"을/를 조회하시겠습니까?"
-If it's QueryByQuery, ask ""content + time"을 조회하시겠습니까?"
-If it's CreatePlan, ask ""content"을/를 추가하시겠습니까?"
-If it's RecommandPlan, ask ""content"을/를 추천해드릴까요?"
-If it's UpdatePlan, ask ""content"을 변경 또는 수정하시겠습니까?"
-If it's DeletePlan, ask ""content"을 삭제하시겠습니까?"
-"""
-
-
 kernel = sk.Kernel()
 
 api_key, org_id = sk.openai_settings_from_dot_env()
@@ -103,8 +81,9 @@ chat_function = kernel.register_semantic_function("ChatBot", "Chat", function_co
 extract_function_config = sk.SemanticFunctionConfig(prompt_config, extract_template)
 extract_function = kernel.register_semantic_function("EXTRACT", "Extract", extract_function_config)
 
-crud_function_config = sk.SemanticFunctionConfig(prompt_config, crud_template)
-crud_function = kernel.register_semantic_function("CRUD", "Crud", crud_function_config)
+async def extract_data (user_input, context_vars):
+    try:
+        answer.awiat kernel.run_async(extract_func, input_vars{'$chat_history': context_vars['chat_history'], '$user_input': user_input})
 
 async def chat(context_vars: sk.ContextVariables) -> bool:
     try:
@@ -120,28 +99,26 @@ async def chat(context_vars: sk.ContextVariables) -> bool:
     if user_input == "exit":
         print("\n\nExiting chat...")
         return False
+    
+    if extract_data:
+        
 
     # Run extract_function
     extracted_response = await kernel.run_async(extract_function, input_vars=context_vars)
 
     # Check if extract_function provided a valid response
     if not extracted_response or "error" in extracted_response:
-        # If not, run crud_function
-        answer = await kernel.run_async(crud_function, input_vars=context_vars)
+        # If not, run chat_function
+        answer = await kernel.run_async(chat_function, input_vars=context_vars)
+
     else:
-        # If it is a CRUD action, execute the crud_function
-        if "QueryByTime"  or "QueryByQuery"  or "CreatePlan"  or "RecommandPlan"  or "UpdatePlan" or "DeletePlan":
-            crud_response = await kernel.run_async(crud_function, input_vars=context_vars)
-            answer = crud_response
-        else:
-            # If not, run chat_function
-            answer = await kernel.run_async(chat_function, input_vars=context_vars)
+        # Extract 'answer' from 'extracted_response'
+        answer = extracted_response.get("answer", "I'm sorry, there was an issue with the response.")
 
     context_vars["chat_history"] += f"\nUser:> {user_input}\nChatBot:> {answer}\n"
     print(f"ChatBot:> {answer}")
 
     return True
-
 
 async def main() -> None:
     context = sk.ContextVariables()
